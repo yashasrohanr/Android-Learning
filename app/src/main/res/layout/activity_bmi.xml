@@ -174,5 +174,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDescription"
         app:layout_constraintVertical_bias="0.193" />
+    <FrameLayout
+        android:id="@+id/flProgressBarCustom"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnCalculate"
+        >
+
+        <ProgressBar
+            android:id="@+id/customProgressBarBase"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:max="200"
+            android:progress="0"
+            android:progressDrawable="@drawable/circular"
+            android:rotation="145"></ProgressBar>
+
+        <ProgressBar
+            android:id="@+id/customProgressBarYellow"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:max="140"
+            android:progress="0"
+            android:progressDrawable="@drawable/circular_yellow"
+            android:rotation="145"></ProgressBar>
+
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

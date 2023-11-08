@@ -14,5 +14,9 @@
     <color name="lightGreen">#54DC54</color>
     <color name="red">#FD1908</color>
     <color name="yellow">#FAE104</color>
+    <color name="graphBlue">#2756FF</color>
+    <color name="graphPurple">#7C2CFD</color>
+    <color name="graphCyan">#1CF1F1</color>
+    <color name="graphRed">#F71561</color>
 
 </resources>
