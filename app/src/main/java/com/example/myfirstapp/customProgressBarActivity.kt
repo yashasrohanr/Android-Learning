@@ -3,7 +3,10 @@ package com.example.myfirstapp
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.CornerPathEffect
 import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Shader
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -14,9 +17,11 @@ import androidx.core.content.ContextCompat
 import com.example.myfirstapp.databinding.ActivityCustomProgressBarBinding
 import com.github.mikephil.charting.animation.ChartAnimator
 import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
@@ -65,6 +70,7 @@ class customProgressBarActivity : AppCompatActivity() {
         }
         override fun drawLinear(c: Canvas?, dataSet: ILineDataSet?) {
             val transformer = mchart.getTransformer(dataSet?.axisDependency)
+            mRenderPaint.strokeJoin = Paint.Join.ROUND
             if (dataSet?.entryCount!! > 0) {
                 for (i in 0..dataSet.entryCount - 2) {
                     val e1 = dataSet.getEntryForIndex(i)
@@ -74,7 +80,8 @@ class customProgressBarActivity : AppCompatActivity() {
                         //same level no gradient, horizontal line
                         val color = getColor(e2.y)
                         mRenderPaint.color = color
-
+                        mRenderPaint.strokeWidth = 25f
+                        //mRenderPaint.strokeJoin = Paint.Join.ROUND
                         val p1 = transformer.getPixelForValues(e1.x, e1.y)
                         val p2 = transformer.getPixelForValues(e2.x, e2.y)
 
@@ -84,14 +91,14 @@ class customProgressBarActivity : AppCompatActivity() {
                     ///////////////////////////////////////////////////////////////////////////////////
                     else{
                         //different level, different gradient
+                        mRenderPaint.strokeWidth = 4f
+                        //mRenderPaint.strokeJoin = Paint.Join.ROUND
 
                         val dx = e2.x - e1.x
-
                         val c4 = getColor(4f)
                         val c3 = getColor(3f)
                         val c2 = getColor(2f)
                         val c1 = getColor(1f)
-
                         if(e2.y == 1f)  //final stage ends at 1f
                         {
                             if(e1.y == 4f){
@@ -185,6 +192,7 @@ class customProgressBarActivity : AppCompatActivity() {
                                 )
                                 mRenderPaint.shader = gradient1
                                 c?.drawLine(px1.x.toFloat(), px1.y.toFloat(), px2.x.toFloat(), px2.y.toFloat(), mRenderPaint)
+
 
                             }else{
                                 //e1.y == 1f
@@ -282,7 +290,6 @@ class customProgressBarActivity : AppCompatActivity() {
                                 mRenderPaint.shader = gradient1
                                 c?.drawLine(px1.x.toFloat(), px1.y.toFloat(), px2.x.toFloat(), px2.y.toFloat(), mRenderPaint)
 
-
                             }else if( e1.y == 2f){
                                 //2 stage transform
                                 //2f to 4f = 2 to 3, 3 to 4
@@ -329,7 +336,7 @@ class customProgressBarActivity : AppCompatActivity() {
         val entries: ArrayList<Entry> = generateRandomData()
         val linedata = LineData()
         val dataset = LineDataSet(entries, "Sleep stages")
-
+        dataset.setDrawValues(false)
         val customRenderer = customRenderer(sleepGraph, sleepGraph.animator, sleepGraph.viewPortHandler, applicationContext)
         sleepGraph.renderer = customRenderer
 
@@ -338,9 +345,25 @@ class customProgressBarActivity : AppCompatActivity() {
         sleepGraph.axisRight.isEnabled = true
         sleepGraph.axisRight.setDrawLabels(true)
         sleepGraph.legend.isEnabled = false
+        
 
-        dataset.mode = LineDataSet.Mode.STEPPED
-        dataset.lineWidth = 3f
+        val rAxis = sleepGraph.axisRight
+        rAxis.isEnabled = true
+        rAxis.setDrawLabels(true)
+        rAxis.axisMinimum = 1f
+        rAxis.axisMaximum = 4f
+        rAxis.valueFormatter = object : ValueFormatter() {
+            override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+                return when (value) {
+                    1f -> "Deep"
+                    2f -> "LIGHT"
+                    3f -> "REM"
+                    4f -> "AWAKE"
+                }
+            }
+        }
+
+        dataset.mode = LineDataSet.Mode.LINEAR
         dataset.setDrawCircles(false)
         linedata.addDataSet(dataset)
         sleepGraph.data = linedata
@@ -448,6 +471,44 @@ class customProgressBarActivity : AppCompatActivity() {
 
         return randomEntries
     }
+
+    fun generateCustomData(): ArrayList<Entry> {
+        val customEntries: ArrayList<Entry> = ArrayList()
+        var xx = 0.1f
+
+        // First 10 values as 1f
+        repeat(10) {
+            customEntries.add(Entry(xx, 1f))
+            xx += 0.1f
+        }
+
+        // Next 20 values as 2f
+        repeat(20) {
+            customEntries.add(Entry(xx, 2f))
+            xx += 0.1f
+        }
+
+        // Next 5 values as 4f
+        repeat(5) {
+            customEntries.add(Entry(xx, 4f))
+            xx += 0.1f
+        }
+
+        // Next 30 values as 3f
+        repeat(30) {
+            customEntries.add(Entry(xx, 3f))
+            xx += 0.1f
+        }
+
+        // Next 10 values as 4f
+        repeat(10) {
+            customEntries.add(Entry(xx, 4f))
+            xx += 0.1f
+        }
+
+        return customEntries
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         binding_ = null
